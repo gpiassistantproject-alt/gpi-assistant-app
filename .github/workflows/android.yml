@@ -22,15 +22,38 @@ jobs:
         with:
           gradle-version: '9.7.0'
 
-      - name: Check project
+      - name: Find Gradle project
         run: |
-          echo "Project files:"
-          ls -la
-          echo "Gradle version:"
-          gradle --version
+          echo "Current directory:"
+          pwd
+
+          echo "Searching for settings.gradle..."
+          find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print
+
+          SETTINGS_FILE=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print -quit)
+
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "ERROR: settings.gradle or settings.gradle.kts not found!"
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+
+          echo "Gradle project found:"
+          echo "$PROJECT_DIR"
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Build Debug APK
         run: |
+          cd "$PROJECT_DIR"
+
+          echo "Building from:"
+          pwd
+
+          echo "Project files:"
+          ls -la
+
           gradle clean assembleDebug \
             --no-daemon \
             --no-build-cache \
