@@ -17,36 +17,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Unzip project files
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.7.0'
+
+      - name: Check project
         run: |
-          unzip -o *.zip
-
-      - name: Find Android project
-        run: |
-          echo "Searching for Gradle wrapper..."
-
-          GRADLEW=$(find . -type f -name "gradlew" -print -quit)
-
-          if [ -z "$GRADLEW" ]; then
-            echo "ERROR: gradlew was not found!"
-            echo "Files in repository:"
-            find . -maxdepth 4 -type f | head -200
-            exit 1
-          fi
-
-          PROJECT_DIR=$(dirname "$GRADLEW")
-
-          echo "Gradle wrapper found at: $GRADLEW"
-          echo "Project directory: $PROJECT_DIR"
-
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Project files:"
+          ls -la
+          echo "Gradle version:"
+          gradle --version
 
       - name: Build Debug APK
         run: |
-          cd "$PROJECT_DIR"
-          chmod +x gradlew
-
-          ./gradlew clean assembleDebug \
+          gradle clean assembleDebug \
             --no-daemon \
             --no-build-cache \
             --stacktrace
