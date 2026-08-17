@@ -12,7 +12,6 @@ jobs:
     - name: Unzip project files
       run: |
         unzip -o *.zip
-        # ফাইল যদি কোনো সাব-ফোল্ডারে আনজিপ হয়ে থাকে তবে তা মূল ডিরেক্টরিতে আনবে
         if [ -d "gpi-assistant" ]; then mv gpi-assistant/* . ; fi
 
     - name: Set up JDK 17
